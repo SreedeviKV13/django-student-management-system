@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Students{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+  <div>
+    <h1 class="page-title mb-1">Students</h1>
+    <p class="text-muted mb-0" role="status">
+      {% if filters_active %}
+        {{ total_results }} student{{ total_results|pluralize }} match your search.
+      {% else %}
+        {{ total_results }} student{{ total_results|pluralize }} in total.
+      {% endif %}
+    </p>
+  </div>
+  <a class="btn btn-primary" href="{% url 'students:create' %}">
+    <i class="bi bi-person-plus me-1" aria-hidden="true"></i>Add Student
+  </a>
+</div>
+
+<form method="get" action="{% url 'students:list' %}" class="card filter-card mb-4" role="search" aria-label="Search and filter students">
+  <div class="card-body">
+    <div class="row g-3 align-items-end">
+      <div class="col-lg-4">
+        <label class="form-label" for="{{ filter_form.q.id_for_label }}">{{ filter_form.q.label }}</label>
+        {{ filter_form.q }}
+      </div>
+      <div class="col-sm-6 col-lg-2">
+        <label class="form-label" for="{{ filter_form.department.id_for_label }}">{{ filter_form.department.label }}</label>
+        {{ filter_form.department }}
+      </div>
+      <div class="col-sm-6 col-lg-2">
+        <label class="form-label" for="{{ filter_form.course.id_for_label }}">{{ filter_form.course.label }}</label>
+        {{ filter_form.course }}
+      </div>
+      <div class="col-sm-6 col-lg-2">
+        <label class="form-label" for="{{ filter_form.academic_year.id_for_label }}">{{ filter_form.academic_year.label }}</label>
+        {{ filter_form.academic_year }}
+      </div>
+      <div class="col-sm-6 col-lg-2 d-flex gap-2">
+        <button type="submit" class="btn btn-primary flex-grow-1">
+          <i class="bi bi-search me-1" aria-hidden="true"></i>Filter
+        </button>
+        <a class="btn btn-outline-secondary" href="{% url 'students:list' %}" title="Clear all search and filters">Clear</a>
+      </div>
+    </div>
+  </div>
+</form>
+
+<section class="card" aria-label="Student results">
+  {% if page_obj.object_list %}
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <caption class="visually-hidden">List of students</caption>
+        <thead>
+          <tr>
+            <th scope="col">Roll no.</th>
+            <th scope="col">Name</th>
+            <th scope="col" class="d-none d-lg-table-cell">Email</th>
+            <th scope="col" class="d-none d-md-table-cell">Department</th>
+            <th scope="col" class="d-none d-md-table-cell">Course</th>
+            <th scope="col">Year</th>
+            <th scope="col" class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for student in page_obj %}
+            <tr>
+              <td class="fw-semibold">{{ student.roll_number }}</td>
+              <td><a class="fw-medium" href="{% url 'students:detail' student.pk %}">{{ student.full_name }}</a></td>
+              <td class="d-none d-lg-table-cell text-muted">{{ student.email }}</td>
+              <td class="d-none d-md-table-cell">{{ student.get_department_display }}</td>
+              <td class="d-none d-md-table-cell">{{ student.get_course_display }}</td>
+              <td>{{ student.get_academic_year_display }}</td>
+              <td class="text-end text-nowrap">
+                <a class="btn btn-sm btn-outline-primary" href="{% url 'students:detail' student.pk %}"
+                   aria-label="View {{ student.full_name }}"><i class="bi bi-eye" aria-hidden="true"></i></a>
+                <a class="btn btn-sm btn-outline-secondary" href="{% url 'students:update' student.pk %}"
+                   aria-label="Edit {{ student.full_name }}"><i class="bi bi-pencil" aria-hidden="true"></i></a>
+                <a class="btn btn-sm btn-outline-danger" href="{% url 'students:delete' student.pk %}"
+                   aria-label="Delete {{ student.full_name }}"><i class="bi bi-trash" aria-hidden="true"></i></a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card-footer d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+      <span class="small text-muted">
+        Showing {{ page_obj.start_index }}&ndash;{{ page_obj.end_index }} of {{ total_results }}
+      </span>
+      {% include "students/includes/pagination.html" %}
+    </div>
+  {% else %}
+    <div class="card-body">
+      <div class="empty-state">
+        {% if filters_active %}
+          <i class="bi bi-search" aria-hidden="true"></i>
+          <p class="mb-1 fw-semibold">No students match your search.</p>
+          <p class="text-muted small mb-3">Try a different keyword or remove some filters.</p>
+          <a class="btn btn-outline-primary" href="{% url 'students:list' %}">Clear filters</a>
+        {% else %}
+          <i class="bi bi-people" aria-hidden="true"></i>
+          <p class="mb-1 fw-semibold">There are no students yet.</p>
+          <p class="text-muted small mb-3">Add your first student to start building the list.</p>
+          <a class="btn btn-primary" href="{% url 'students:create' %}">Add Student</a>
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

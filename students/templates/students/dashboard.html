@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+  <div>
+    <h1 class="page-title mb-1">Dashboard</h1>
+    <p class="text-muted mb-0">Overview of your student records.</p>
+  </div>
+  <a class="btn btn-primary" href="{% url 'students:create' %}">
+    <i class="bi bi-person-plus me-1" aria-hidden="true"></i>Add Student
+  </a>
+</div>
+
+<section aria-label="Key statistics" class="row g-3 mb-4">
+  <div class="col-6 col-lg-3">
+    <div class="card stat-card h-100">
+      <div class="card-body">
+        <div class="stat-icon" aria-hidden="true"><i class="bi bi-people-fill"></i></div>
+        <p class="stat-label mb-1">Total students</p>
+        <p class="stat-value mb-0">{{ total_students }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card stat-card h-100">
+      <div class="card-body">
+        <div class="stat-icon" aria-hidden="true"><i class="bi bi-building"></i></div>
+        <p class="stat-label mb-1">Departments</p>
+        <p class="stat-value mb-0">{{ total_departments }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card stat-card h-100">
+      <div class="card-body">
+        <div class="stat-icon" aria-hidden="true"><i class="bi bi-journal-bookmark-fill"></i></div>
+        <p class="stat-label mb-1">Courses</p>
+        <p class="stat-value mb-0">{{ total_courses }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card stat-card h-100">
+      <div class="card-body">
+        <div class="stat-icon" aria-hidden="true"><i class="bi bi-calendar-check-fill"></i></div>
+        <p class="stat-label mb-1">{{ current_year }} admissions</p>
+        <p class="stat-value mb-0">{{ current_year_admissions }}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="row g-4">
+  <div class="col-lg-7">
+    <section class="card h-100" aria-labelledby="distribution-heading">
+      <div class="card-header"><h2 class="h6 mb-0" id="distribution-heading">Students by department</h2></div>
+      <div class="card-body">
+        {% if department_stats %}
+          {# Chart.js chart: stays hidden unless the library loads. #}
+          <div id="chart-wrapper" class="chart-wrapper d-none mb-4">
+            <canvas id="departmentChart" role="img" aria-label="Bar chart of students per department"></canvas>
+          </div>
+
+          <ul class="list-unstyled mb-0 distribution-list">
+            {% for item in department_stats %}
+              <li class="mb-3">
+                <div class="d-flex justify-content-between small mb-1">
+                  <span>{{ item.label }}</span>
+                  <span class="fw-semibold">{{ item.count }} <span class="text-muted">({{ item.percent }}%)</span></span>
+                </div>
+                <div class="progress" role="progressbar" aria-label="{{ item.label }}"
+                     aria-valuenow="{{ item.percent }}" aria-valuemin="0" aria-valuemax="100">
+                  <div class="progress-bar" style="width: {{ item.percent }}%"></div>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="empty-state">
+            <i class="bi bi-bar-chart-line" aria-hidden="true"></i>
+            <p class="mb-2">No data to show yet.</p>
+            <p class="text-muted small mb-0">Add students to see how they are spread across departments.</p>
+          </div>
+        {% endif %}
+      </div>
+    </section>
+  </div>
+
+  <div class="col-lg-5">
+    <section class="card h-100" aria-labelledby="years-heading">
+      <div class="card-header"><h2 class="h6 mb-0" id="years-heading">Students by academic year</h2></div>
+      <div class="card-body">
+        {% if year_stats %}
+          <ul class="list-unstyled mb-0 distribution-list">
+            {% for item in year_stats %}
+              <li class="mb-3">
+                <div class="d-flex justify-content-between small mb-1">
+                  <span>{{ item.label }}</span>
+                  <span class="fw-semibold">{{ item.count }} <span class="text-muted">({{ item.percent }}%)</span></span>
+                </div>
+                <div class="progress" role="progressbar" aria-label="{{ item.label }}"
+                     aria-valuenow="{{ item.percent }}" aria-valuemin="0" aria-valuemax="100">
+                  <div class="progress-bar progress-bar-accent" style="width: {{ item.percent }}%"></div>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="empty-state">
+            <i class="bi bi-pie-chart" aria-hidden="true"></i>
+            <p class="mb-0">No academic year data yet.</p>
+          </div>
+        {% endif %}
+      </div>
+    </section>
+  </div>
+</div>
+
+<section class="card mt-4" aria-labelledby="recent-heading">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h2 class="h6 mb-0" id="recent-heading">Recently added students</h2>
+    <a class="small" href="{% url 'students:list' %}">View all</a>
+  </div>
+  {% if recent_students %}
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <caption class="visually-hidden">The five most recently added students</caption>
+        <thead>
+          <tr>
+            <th scope="col">Roll no.</th>
+            <th scope="col">Name</th>
+            <th scope="col" class="d-none d-md-table-cell">Department</th>
+            <th scope="col" class="d-none d-md-table-cell">Course</th>
+            <th scope="col">Year</th>
+            <th scope="col" class="d-none d-sm-table-cell">Added</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for student in recent_students %}
+            <tr>
+              <td class="fw-semibold">{{ student.roll_number }}</td>
+              <td><a href="{{ student.get_absolute_url }}">{{ student.full_name }}</a></td>
+              <td class="d-none d-md-table-cell">{{ student.get_department_display }}</td>
+              <td class="d-none d-md-table-cell">{{ student.get_course_display }}</td>
+              <td>{{ student.get_academic_year_display }}</td>
+              <td class="d-none d-sm-table-cell text-muted">{{ student.created_at|date:"d M Y" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="card-body">
+      <div class="empty-state">
+        <i class="bi bi-person-plus" aria-hidden="true"></i>
+        <p class="mb-3">No students yet. Add your first student to get started.</p>
+        <a class="btn btn-primary" href="{% url 'students:create' %}">Add Student</a>
+      </div>
+    </div>
+  {% endif %}
+</section>
+
+{{ chart_data|json_script:"chart-data" }}
+{% endblock %}
+
+{% block extra_js %}
+  {# The chart is optional. If this CDN script fails to load, the page still works. #}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="{% static 'students/js/dashboard.js' %}"></script>
+{% endblock %}

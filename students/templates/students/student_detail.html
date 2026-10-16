@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}{{ student.full_name }}{% endblock %}
+
+{% block content %}
+<nav aria-label="Breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'students:list' %}">Students</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ student.full_name }}</li>
+  </ol>
+</nav>
+
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card text-center h-100">
+      <div class="card-body py-4">
+        <div class="avatar mx-auto mb-3" aria-hidden="true">{{ student.initials }}</div>
+        <h1 class="h4 mb-1">{{ student.full_name }}</h1>
+        <p class="text-muted mb-2">{{ student.roll_number }}</p>
+        <span class="badge badge-brand">{{ student.get_course_display }}</span>
+        <span class="badge text-bg-light border">{{ student.get_academic_year_display }}</span>
+
+        <div class="d-grid gap-2 mt-4">
+          <a class="btn btn-primary" href="{% url 'students:update' student.pk %}">
+            <i class="bi bi-pencil me-1" aria-hidden="true"></i>Edit
+          </a>
+          <a class="btn btn-outline-danger" href="{% url 'students:delete' student.pk %}">
+            <i class="bi bi-trash me-1" aria-hidden="true"></i>Delete
+          </a>
+          <a class="btn btn-outline-secondary" href="{% url 'students:list' %}">
+            <i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Back to list
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-8">
+    <div class="card mb-4">
+      <div class="card-header"><h2 class="h6 mb-0">Personal &amp; contact information</h2></div>
+      <div class="card-body">
+        <dl class="row detail-list mb-0">
+          <dt class="col-sm-4">Email</dt>
+          <dd class="col-sm-8"><a href="mailto:{{ student.email }}">{{ student.email }}</a></dd>
+
+          <dt class="col-sm-4">Phone</dt>
+          <dd class="col-sm-8">{{ student.phone_number }}</dd>
+
+          <dt class="col-sm-4">Gender</dt>
+          <dd class="col-sm-8">{{ student.get_gender_display }}</dd>
+
+          <dt class="col-sm-4">Date of birth</dt>
+          <dd class="col-sm-8">{{ student.date_of_birth|date:"d F Y" }} <span class="text-muted">({{ student.age }} years old)</span></dd>
+
+          <dt class="col-sm-4">Address</dt>
+          <dd class="col-sm-8">{{ student.address|linebreaksbr }}</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><h2 class="h6 mb-0">Academic information</h2></div>
+      <div class="card-body">
+        <dl class="row detail-list mb-0">
+          <dt class="col-sm-4">Roll number</dt>
+          <dd class="col-sm-8">{{ student.roll_number }}</dd>
+
+          <dt class="col-sm-4">Department</dt>
+          <dd class="col-sm-8">{{ student.get_department_display }}</dd>
+
+          <dt class="col-sm-4">Course</dt>
+          <dd class="col-sm-8">{{ student.get_course_display }}</dd>
+
+          <dt class="col-sm-4">Academic year</dt>
+          <dd class="col-sm-8">{{ student.get_academic_year_display }}</dd>
+
+          <dt class="col-sm-4">Admission date</dt>
+          <dd class="col-sm-8">{{ student.admission_date|date:"d F Y" }}</dd>
+
+          <dt class="col-sm-4">Record created</dt>
+          <dd class="col-sm-8 text-muted">{{ student.created_at|date:"d M Y, H:i" }}</dd>
+
+          <dt class="col-sm-4">Last updated</dt>
+          <dd class="col-sm-8 text-muted">{{ student.updated_at|date:"d M Y, H:i" }}</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Delete {{ student.full_name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <section class="card border-danger-subtle" aria-labelledby="delete-heading" aria-describedby="delete-warning">
+      <div class="card-body p-4">
+        <div class="text-center mb-3 text-danger fs-1" aria-hidden="true"><i class="bi bi-exclamation-triangle"></i></div>
+        <h1 class="h4 text-center" id="delete-heading">Delete this student?</h1>
+        <p class="text-center text-muted" id="delete-warning">
+          You are about to permanently delete the record below. This action cannot be undone.
+        </p>
+
+        <dl class="row detail-list bg-light rounded-3 p-3 my-4">
+          <dt class="col-5">Name</dt>
+          <dd class="col-7 mb-1">{{ student.full_name }}</dd>
+          <dt class="col-5">Roll number</dt>
+          <dd class="col-7 mb-1">{{ student.roll_number }}</dd>
+          <dt class="col-5">Department</dt>
+          <dd class="col-7 mb-1">{{ student.get_department_display }}</dd>
+          <dt class="col-5">Course</dt>
+          <dd class="col-7 mb-0">{{ student.get_course_display }}</dd>
+        </dl>
+
+        <form method="post" class="d-flex flex-wrap justify-content-center gap-2">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">
+            <i class="bi bi-trash me-1" aria-hidden="true"></i>Yes, delete student
+          </button>
+          <a class="btn btn-outline-secondary" href="{% url 'students:detail' student.pk %}">Cancel</a>
+        </form>
+      </div>
+    </section>
+  </div>
+</div>
+{% endblock %}
